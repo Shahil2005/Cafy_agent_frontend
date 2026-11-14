@@ -1,0 +1,4 @@
+# The app is private (login, dashboard). Crawling stays allowed so search
+# engines can read the X-Robots-Tag: noindex header sent on every page.
+User-agent: *
+Allow: /

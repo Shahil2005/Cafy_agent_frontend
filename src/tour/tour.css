@@ -1,0 +1,224 @@
+.cafy-tour-popover {
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.cafy-tour-popover .driver-popover-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  padding-right: 82px;
+}
+
+.cafy-tour-popover .driver-popover-description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.cafy-tour-popover .driver-popover-progress-text {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.cafy-tour-popover .driver-popover-next-btn,
+.cafy-tour-popover .driver-popover-done-btn {
+  background-color: #2563eb !important;
+  color: #fff !important;
+  border: none !important;
+  text-shadow: none !important;
+}
+
+.cafy-tour-popover .driver-popover-prev-btn {
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.cafy-tour-popover .driver-popover-close-btn {
+  display: none !important;
+}
+
+.cafy-tour-popover .cafy-tour-skip-btn {
+  all: unset;
+  box-sizing: border-box !important;
+  position: absolute !important;
+  top: 15px !important;
+  right: 15px !important;
+  z-index: 2 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  max-width: 74px !important;
+  padding: 4px 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 999px !important;
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-family: Inter, system-ui, sans-serif !important;
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cafy-tour-popover .cafy-tour-skip-btn:hover {
+  background: #eef2f7 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+.cafy-tour-popover .cafy-tour-skip-btn:focus-visible {
+  outline: 2px solid #93c5fd !important;
+  outline-offset: 2px;
+}
+
+@media (max-width: 1023px) {
+  .cafy-tour-popover .driver-popover-title {
+    padding-right: 72px;
+  }
+
+  .cafy-tour-popover .cafy-tour-skip-btn {
+    top: 12px !important;
+    right: 12px !important;
+    max-width: 64px !important;
+    padding: 3px 8px !important;
+    font-size: 0.625rem !important;
+  }
+}
+
+/* Extension / tracker: highlighted interactive targets must receive clicks */
+.driver-active-element[data-tour='extension-download'],
+.driver-active-element[data-tour='tracker-add-job'] {
+  pointer-events: auto !important;
+}
+
+.driver-active-element[data-tour='tracker-add-job'] button,
+.driver-active-element[data-tour='tracker-add-job'] {
+  cursor: pointer;
+}
+
+
+/* Popover must be above driver overlay (z-index 10000) so Next/Previous work */
+.driver-popover.cafy-tour-popover,
+.driver-popover.cafy-tour-over-modal {
+  z-index: 1000000001 !important;
+  pointer-events: auto !important;
+}
+
+.driver-popover.cafy-tour-popover *,
+.driver-popover.cafy-tour-over-modal * {
+  pointer-events: auto !important;
+}
+
+.driver-popover.cafy-tour-popover .driver-popover-footer button,
+.driver-popover.cafy-tour-over-modal .driver-popover-footer button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+body.cafy-tour-kanban-active .driver-popover,
+body.cafy-tour-kanban-active .driver-popover *,
+body.cafy-tour-add-job-active .driver-popover,
+body.cafy-tour-add-job-active .driver-popover * {
+  pointer-events: auto !important;
+}
+
+.driver-popover.cafy-tour-over-modal,
+.driver-active-element[data-tour='add-job-modal'],
+.driver-active-element[data-tour='add-job-form'],
+.driver-active-element[data-tour='add-job-role'],
+.driver-active-element[data-tour='add-job-company'],
+.driver-active-element[data-tour='add-job-description'],
+.driver-active-element[data-tour='add-job-portal'],
+.driver-active-element[data-tour='add-job-submit'] {
+  pointer-events: auto !important;
+}
+
+
+
+body.cafy-tour-kanban-active .driver-overlay {
+  pointer-events: none !important;
+}
+
+body.cafy-tour-kanban-active [data-tour='tracker-kanban'],
+body.cafy-tour-kanban-active [data-tour='tour-job-card'] {
+  pointer-events: auto !important;
+}
+
+body.cafy-tour-kanban-active [data-tour='tour-job-card'] {
+  cursor: grab;
+}
+/* Add-job tour: let overlay pass scroll/wheel to the modal */
+body.cafy-tour-add-job-active .driver-overlay {
+  pointer-events: none !important;
+}
+
+body.cafy-tour-add-job-active [data-tour='add-job-modal'],
+body.cafy-tour-add-job-active [data-tour='add-job-scroll'],
+body.cafy-tour-add-job-active [data-tour='add-job-modal'] *,
+body.cafy-tour-add-job-active [data-tour='add-job-scroll'] * {
+  pointer-events: auto !important;
+}
+
+body.cafy-tour-add-job-active [data-tour='add-job-scroll'] {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+body.cafy-tour-add-job-active .driver-active-element[data-tour='add-job-modal'] {
+  overflow: hidden !important;
+  max-height: min(calc(100dvh - 9rem), 52rem) !important;
+}
+
+body.cafy-tour-add-job-active [data-tour='add-job-submit'] {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 1023px) {
+  .driver-popover.cafy-tour-over-modal {
+    max-width: min(calc(100vw - 20px), 340px) !important;
+  }
+}
+
+
+@media (max-width: 1023px) {
+  .driver-popover.cafy-tour-popover {
+    max-width: min(calc(100vw - 24px), 360px) !important;
+  }
+
+  .driver-popover.cafy-tour-popover .driver-popover-title {
+    font-size: 0.95rem;
+  }
+
+  .driver-popover.cafy-tour-popover .driver-popover-description {
+    font-size: 0.8125rem;
+  }
+}
+/* Mobile add-job: pin tour card to top so Track Application stays clickable below */
+@media (max-width: 1023px) {
+  body.cafy-tour-add-job-active .driver-popover.cafy-tour-over-modal {
+    position: fixed !important;
+    top: max(8px, env(safe-area-inset-top, 0px)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    transform: none !important;
+    margin: 0 !important;
+  }
+
+  body.cafy-tour-add-job-active [data-tour='add-job-submit'] {
+    z-index: 1000000002 !important;
+    position: relative;
+  }
+
+  body.cafy-tour-add-job-active .driver-active-element[data-tour='add-job-submit'] {
+    overflow: visible !important;
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://www.gstatic.com https://www.google.com https://accounts.google.com https://apis.google.com https://challenges.cloudflare.com https://us.i.posthog.com https://*.i.posthog.com https://js.stripe.com https://vercel.live https://auth.cafy.careers https://*.cafy.careers; script-src-elem 'self' https://www.gstatic.com https://www.google.com https://accounts.google.com https://apis.google.com https://challenges.cloudflare.com https://us.i.posthog.com https://*.i.posthog.com https://js.stripe.com https://vercel.live https://auth.cafy.careers https://*.cafy.careers; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://*.asia-southeast1.firebasedatabase.app wss://*.firebaseio.com wss://*.firebasedatabase.app wss://*.asia-southeast1.firebasedatabase.app https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://generativelanguage.googleapis.com https://api.cafy.careers https://auth.cafy.careers https://*.cafy.careers https://*.vercel.app https://api.stripe.com https://checkout.stripe.com https://billing.stripe.com https://js.stripe.com https://*.supabase.co https://us.i.posthog.com https://*.i.posthog.com https://*.ingest.sentry.io https://*.sentry.io blob:; worker-src 'self' blob:; frame-src 'self' blob: https://auth.cafy.careers https://*.cafy.careers https://*.firebaseapp.com https://*.supabase.co https://accounts.google.com https://www.google.com https://challenges.cloudflare.com https://checkout.stripe.com https://billing.stripe.com https://js.stripe.com https://vercel.live; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com https://billing.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests;"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ]
+}

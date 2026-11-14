@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* DOCX preview styling - Minimalist container approach */
+.docx-preview-container {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+/* 
+   Note: High-fidelity overrides for .docx-wrapper and .docx 
+   are now managed within the DocxPreview component to ensure 
+   they only apply to the visual preview context.
+*/
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased font-sans;
+  }
+}
+
+@layer components {
+
+  /* Professional Card Style */
+  .card {
+    @apply bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* Primary Action Button */
+  .btn-primary {
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
+  }
+
+  /* Secondary/Ghost Button */
+  .btn-ghost {
+    @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-3 py-2 rounded-lg transition-colors;
+  }
+
+  /* Standard Input Field */
+  .input-field {
+    @apply w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none placeholder:text-slate-400;
+  }
+
+  /* Badge/Pill Styles */
+  .badge {
+    @apply px-2.5 py-0.5 rounded-full text-xs font-medium inline-flex items-center gap-1.5;
+  }
+
+  .badge-blue {
+    @apply bg-blue-50 text-blue-700 border border-blue-200;
+  }
+
+  .badge-green {
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+
+  .badge-amber {
+    @apply bg-amber-50 text-amber-700 border border-amber-200;
+  }
+
+  .badge-slate {
+    @apply bg-slate-100 text-slate-700 border border-slate-200;
+  }
+}
+
+/* Scrollbar Utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes cafy-indeterminate {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(280%);
+  }
+}
+
+.cafy-indeterminate-bar {
+  position: relative;
+  overflow: hidden;
+  height: 2px;
+  background: #dce8ff;
+}
+
+.cafy-indeterminate-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: #1955da;
+  animation: cafy-indeterminate 1.05s ease-in-out infinite;
+}
+
+.cafy-indeterminate-bar-on-blue {
+  background: rgb(15 37 80 / 0.35);
+}
+
+.cafy-indeterminate-bar-on-blue::after {
+  background: #ffffff;
+}
+
+/* Custom Thin Scrollbar for Professional Feel */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184 / 0.45) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-slate-400/30 rounded-full;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400/50;
+}
+
+/* Career Path generating: lock sidebar / mobile menu so users stay on the progress screen */
+body.cafy-nav-locked [data-cafy-sidebar],
+body.cafy-nav-locked [data-cafy-mobile-menu] {
+  pointer-events: none !important;
+  opacity: 0.45;
+  cursor: not-allowed;
+}
