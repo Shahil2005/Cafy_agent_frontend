@@ -1,0 +1,20 @@
+# Files Vercel does not upload when deploying the site.
+
+# Secrets and local env copies (set VITE_* values in Vercel > Settings > Environment Variables)
+.env
+.env.*
+!.env.example
+*.bak
+
+# Local build output, dependencies and logs (Vercel installs and builds itself)
+node_modules
+dist
+dist-ssr
+.vercel
+*.log
+
+# Developer-only: check scripts and local preview pages (not part of the built site)
+scripts/
+career-match-preview.html
+job-chat-preview.html
+sponsorship-preview.html

@@ -5,9 +5,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-# local env files
+# local env files (only the example is shared)
 .env
-.env.local
+.env.*
+!.env.example
+*.bak
 node_modules
 dist
 dist-ssr
