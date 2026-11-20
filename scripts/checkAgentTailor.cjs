@@ -37,6 +37,7 @@ assert.equal(none.phone, "", "date ranges are not phone numbers");
 assert.equal(pdfSafe("Lead – “Lean” work’s … £30k café →"), 'Lead - "Lean" work\'s ... £30k café');
 
 // The PDF
+const EMPTY = () => ({ headline: "", summary: "", skills: [], experience: [], education: [], projects: [], certifications: [], extras: [] });
 const tailored = {
   headline: "Continuous Improvement Analyst | Lean Six Sigma Green Belt",
   summary: "Operations analyst who runs Lean and Kaizen work.",
@@ -55,6 +56,26 @@ assert.ok(raw.includes("(Priya Shah)"), "name written as real text, so ATS can r
 assert.ok(raw.includes("Continuous Improvement Analyst"));
 assert.ok(raw.includes("2021 - Present"));
 assert.ok(doc.getNumberOfPages() >= 2, "long CVs flow onto more pages");
+// Every template writes the same facts as real text and flows onto more pages.
+const { CV_TEMPLATES, cvTemplate } = load("../src/components/cafy-agent/tailor/cvTemplates.ts");
+assert.ok(CV_TEMPLATES.length >= 6);
+assert.equal(new Set(CV_TEMPLATES.map((t) => t.id)).size, CV_TEMPLATES.length, "template ids are unique");
+assert.equal(cvTemplate("no-such-template").id, "classic", "an unknown template falls back to Classic");
+for (const template of CV_TEMPLATES) {
+  assert.equal(new Set(template.order).size, 7, `${template.id}: every section appears once`);
+  const d = buildTailoredCvPdf(tailored, c, template.id);
+  const text = d.output();
+  assert.ok(text.includes("(Priya Shah)"), `${template.id}: name is real text`);
+  for (const fact of ["Continuous Improvement Analyst", "Acme 11", "2021 - Present", "University of Leeds", "Gujarati", "Kaizen"]) {
+    assert.ok(text.includes(fact), `${template.id}: writes ${fact}`);
+  }
+  assert.ok(d.getNumberOfPages() >= 2, `${template.id}: long CVs flow onto more pages`);
+}
+const short = { ...tailored, experience: tailored.experience.slice(0, 2) };
+assert.ok(buildTailoredCvPdf(short, c, "compact").getNumberOfPages() <= buildTailoredCvPdf(short, c, "executive").getNumberOfPages(), "compact is never longer than executive");
+const empty = { ...EMPTY(), experience: [{ title: "Analyst", employer: "Acme", bullets: ["Did work."] }] };
+for (const template of CV_TEMPLATES) buildTailoredCvPdf(empty, { name: "", email: "", phone: "", location: "", linkedin: "", website: "" }, template.id);
+
 assert.equal(tailoredCvFileName("Priya Shah", "CI Analyst / Lead"), "Priya Shah CV - CI Analyst Lead.pdf");
 assert.equal(tailoredCvFileName("", ""), "Tailored CV.pdf");
 

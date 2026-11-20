@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, ArrowLeft, Check, Download, FileText, Loader2, Pencil, RotateCcw, Sparkles, X } from "lucide-react";
 import {
   AGENT_MAX_CV_CHARS, AGENT_MAX_JOB_DESCRIPTION_CHARS, AGENT_MIN_JOB_DESCRIPTION_CHARS,
@@ -7,6 +7,19 @@ import {
 import { CvTailorError, requestTailoredCv, requestTailorQuestions } from "../../../services/cvTailorClient";
 import { EMPTY_CONTACT, extractContactDetails, type ContactDetails } from "./contactDetails";
 import { buildTailoredCvPdf, tailoredCvFileName } from "./tailoredCvPdf";
+import { cvTemplate, DEFAULT_TEMPLATE_ID } from "./cvTemplates";
+import CvTemplatePicker from "./CvTemplatePicker";
+import PdfPreview from "../../common/PdfPreview";
+
+const TEMPLATE_KEY = "cafy.cvTemplate";
+
+function savedTemplateId(): string {
+  try {
+    return cvTemplate(localStorage.getItem(TEMPLATE_KEY) ?? undefined).id;
+  } catch {
+    return DEFAULT_TEMPLATE_ID;
+  }
+}
 
 /**
  * "/cv" in the chat: choose a CV, paste a job description, answer a few questions, get a tailored CV as a PDF.
@@ -52,9 +65,38 @@ export default function CvTailorFlow({ cvOptions, currentCv, readCv, onClose, on
   const [contact, setContact] = useState<ContactDetails>(EMPTY_CONTACT);
   const [editing, setEditing] = useState(false);
   const [failure, setFailure] = useState<Failure | null>(null);
+  const [templateId, setTemplateId] = useState(savedTemplateId);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const controller = useRef<AbortController | null>(null);
+  const urls = useRef<string[]>([]);
 
-  useEffect(() => () => controller.current?.abort(), []);
+  useEffect(() => () => {
+    controller.current?.abort();
+    urls.current.forEach((u) => URL.revokeObjectURL(u));
+  }, []);
+
+  // The preview is the real PDF, rebuilt shortly after the CV, the contact details or the template change.
+  useEffect(() => {
+    if (!result) return;
+    const timer = window.setTimeout(() => {
+      const url = URL.createObjectURL(buildTailoredCvPdf(result.cv, contact, templateId).output("blob"));
+      urls.current.push(url);
+      setPdfUrl(url);
+      // Free older previews once the new one has had time to load in their place.
+      const old = urls.current.splice(0, urls.current.length - 2);
+      window.setTimeout(() => old.forEach((u) => URL.revokeObjectURL(u)), 5000);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [result, contact, templateId]);
+
+  function chooseTemplate(id: string) {
+    setTemplateId(id);
+    try {
+      localStorage.setItem(TEMPLATE_KEY, id);
+    } catch {
+      // Remembering the choice is a convenience only.
+    }
+  }
   useEffect(() => onGrow(), [stage, index, failure, onGrow]);
 
   const fresh = () => {
@@ -147,7 +189,7 @@ export default function CvTailorFlow({ cvOptions, currentCv, readCv, onClose, on
 
   function download() {
     if (!result) return;
-    buildTailoredCvPdf(result.cv, contact).save(tailoredCvFileName(contact.name, job?.title ?? ""));
+    buildTailoredCvPdf(result.cv, contact, templateId).save(tailoredCvFileName(contact.name, job?.title ?? ""));
   }
 
   const busy = stage === "reading" || stage === "building";
@@ -267,6 +309,8 @@ export default function CvTailorFlow({ cvOptions, currentCv, readCv, onClose, on
 
           <ContactForm contact={contact} onChange={setContact} />
 
+          <CvTemplatePicker value={templateId} onChange={chooseTemplate} />
+
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={download} className="inline-flex items-center gap-2 rounded-xl bg-cafy-600 px-4 py-2.5 text-xs font-semibold text-white"><Download size={14} aria-hidden />Download PDF</button>
             <button type="button" onClick={() => setEditing((v) => !v)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-700 hover:border-cafy-300">
@@ -278,7 +322,13 @@ export default function CvTailorFlow({ cvOptions, currentCv, readCv, onClose, on
 
           {editing
             ? <CvEditor cv={result.cv} onChange={(next) => setResult({ ...result, cv: next })} />
-            : <CvPreviewDoc cv={result.cv} contact={contact} />}
+            : (
+              <div className="h-[70vh] min-h-[420px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100" aria-label={`Tailored CV preview, ${cvTemplate(templateId).name} template`}>
+                {pdfUrl
+                  ? <PdfPreview url={pdfUrl} />
+                  : <p className="flex h-full items-center justify-center gap-2 text-xs text-slate-500"><Loader2 size={14} className="animate-spin" aria-hidden />Preparing the preview…</p>}
+              </div>
+            )}
         </div>
       )}
     </article>
@@ -320,58 +370,6 @@ function ContactForm({ contact, onChange }: { contact: ContactDetails; onChange:
         ))}
       </div>
     </details>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="mt-4">
-      <h3 className="border-b border-cafy-600 pb-0.5 text-[11px] font-bold uppercase tracking-wider text-cafy-700">{title}</h3>
-      <div className="mt-2 space-y-2">{children}</div>
-    </section>
-  );
-}
-
-function Bullets({ items }: { items: string[] }) {
-  return <ul className="list-disc space-y-0.5 pl-5">{items.map((b, i) => <li key={i}>{b}</li>)}</ul>;
-}
-
-/** An on-screen copy of the PDF layout. */
-function CvPreviewDoc({ cv, contact }: { cv: TailoredCv; contact: ContactDetails }) {
-  const contactLine = [contact.location, contact.phone, contact.email, contact.linkedin, contact.website].filter(Boolean).join("  |  ");
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-6 py-6 text-[12px] leading-5 text-slate-800 shadow-sm" aria-label="Tailored CV preview">
-      {contact.name && <p className="text-center text-xl font-bold text-slate-900">{contact.name}</p>}
-      {cv.headline && <p className="mt-0.5 text-center text-[13px] text-cafy-700">{cv.headline}</p>}
-      {contactLine && <p className="mt-0.5 text-center text-[11px] text-slate-500">{contactLine}</p>}
-      {cv.summary && <Section title="Profile"><p>{cv.summary}</p></Section>}
-      {cv.skills.length > 0 && <Section title="Key skills">{cv.skills.map((g, i) => <p key={i}><span className="font-semibold">{g.group}:</span> {g.items.join(", ")}</p>)}</Section>}
-      {cv.experience.length > 0 && (
-        <Section title="Experience">
-          {cv.experience.map((role, i) => (
-            <div key={i} className={i ? "pt-2" : ""}>
-              <p className="flex justify-between gap-3"><span className="font-semibold">{role.title || role.employer}</span><span className="shrink-0 text-slate-500">{role.dates}</span></p>
-              {(role.title && role.employer) || role.location ? <p className="italic text-slate-500">{[role.title ? role.employer : "", role.location].filter(Boolean).join(", ")}</p> : null}
-              <Bullets items={role.bullets} />
-            </div>
-          ))}
-        </Section>
-      )}
-      {cv.projects.length > 0 && <Section title="Projects">{cv.projects.map((p, i) => <div key={i}><p className="font-semibold">{p.name}</p><Bullets items={p.bullets} /></div>)}</Section>}
-      {cv.education.length > 0 && (
-        <Section title="Education">
-          {cv.education.map((e, i) => (
-            <div key={i}>
-              <p className="flex justify-between gap-3"><span className="font-semibold">{e.qualification || e.institution}</span><span className="shrink-0 text-slate-500">{e.dates}</span></p>
-              {e.qualification && e.institution && <p className="italic text-slate-500">{e.institution}</p>}
-              {e.details && <p>{e.details}</p>}
-            </div>
-          ))}
-        </Section>
-      )}
-      {cv.certifications.length > 0 && <Section title="Certifications"><Bullets items={cv.certifications} /></Section>}
-      {cv.extras.map((x, i) => <Section key={i} title={x.heading}><Bullets items={x.items} /></Section>)}
-    </div>
   );
 }
 
